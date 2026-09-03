@@ -1,146 +1,100 @@
-# LoginRegister — Sistema de login y registro con PHP, MySQL y JavaScript
+# AuthCore PHP — Sistema de Autenticación & Perfil de Usuario
 
-Proyecto personal completo de autenticación de usuarios: registro, inicio de sesión,
-panel privado, perfil editable y página de contacto. Construido con PHP nativo (PDO),
-MySQL, JavaScript vanilla y CSS moderno sin frameworks.
+Solución integral de autenticación y gestión de usuarios construida con **PHP 8 (PDO)**, **MySQL** y **JavaScript vanilla**. Enfocada en buenas prácticas de seguridad, accesibilidad y diseño moderno nativo sin dependencias externas.
 
-## Características
+## Aspectos Clave
 
-### Backend (PHP + MySQL)
+### Backend & Seguridad
+- Cifrado de contraseñas mediante `password_hash()` y `password_verify()`.
+- Consultas preparadas en el 100 % de las interacciones con la base de datos (protección anti SQLi).
+- Verificación estricta de tokens **CSRF** en cada petición `POST`.
+- Rate limiting / Bloqueo temporal tras 5 intentos fallidos de inicio de sesión.
+- Manejo seguro de sesiones (`session_regenerate_id`) y persistencia mediante tokens ("Recuérdame").
+- Saneamiento sistemático de salidas con `htmlspecialchars()` para prevenir vulnerabilidades XSS.
 
-- Registro con validación en el servidor y contraseñas cifradas (`password_hash()` / `password_verify()`).
-- Sentencias preparadas en el 100 % de las consultas (protección frente a inyección SQL).
-- Tokens **CSRF** generados por sesión en todos los formularios POST.
-- Protección contra **fuerza bruta**: bloqueo de 5 minutos tras 5 intentos fallidos.
-- Sesiones PHP con regeneración de ID y opción «recuérdame» de 30 días.
-- Perfil editable: nombre, correo (con comprobación de duplicados) y contraseña
-  (verificando siempre la actual).
-- Formulario de contacto que guarda los mensajes en la base de datos.
-- Registro del último inicio de sesión de cada usuario.
+### Frontend & Interfaz
+- **Tema Dark/Light** automático y manual con persistencia en `localStorage`.
+- Medidor de fuerza de contraseña e indicadores dinámicos en formularios.
+- Componente de avisos flotantes (Toasts) para retroalimentación instantánea.
+- Interfaz responsiva con CSS Grid/Flexbox y tipografía fluida con `clamp()`.
+- HTML5 semántico con estándares de accesibilidad (atributos ARIA y navegación por teclado).
 
-### Frontend (JavaScript vanilla)
+## Stack Tecnológico
 
-- Menú responsive tipo hamburguesa accesible (`aria-expanded`, cierre con `Esc`).
-- **Tema claro/oscuro** persistente con `localStorage`, respetando la preferencia del sistema.
-- Medidor de fuerza de contraseña en tiempo real.
-- Mostrar/ocultar contraseña en todos los campos sensibles.
-- Validación de coincidencia de contraseñas antes de enviar el formulario.
-- Avisos flotantes (toasts) auto-cerrables para los mensajes flash del servidor.
-- Animaciones al hacer scroll con `IntersectionObserver`.
-- Contador de caracteres en el formulario de contacto.
+| Tecnología | Rol |
+| :--- | :--- |
+| **PHP 8+** | Arquitectura del servidor, lógica de negocio y sesiones |
+| **MySQL** | Persistencia de datos (Usuarios y Mensajes) |
+| **PDO** | Capa de abstracción de base de datos segura |
+| **JavaScript** | Manejo del DOM, validaciones y tema visual |
+| **HTML5 / CSS3** | Estructura semántica y sistema de diseño sin frameworks |
 
-### HTML + CSS
+## Estructura del Proyecto
 
-- HTML5 semántico: un único `<h1>` por página y jerarquía correcta de encabezados.
-- Etiquetas semánticas sin abuso de `<div>`: `header`, `nav`, `main`, `section`,
-  `article`, `aside`, `details`, `address`, `dl`, `progress`…
-- Metadatos SEO por página: título y descripción únicos, Open Graph básico.
-- Accesibilidad: enlace «saltar al contenido», `aria-current`, `aria-live`, foco visible.
-- Sistema de diseño con variables CSS, tipografía fluida con `clamp()`,
-  rejillas automáticas y soporte de `prefers-reduced-motion`.
-
-## Tecnologías
-
-| Tecnología   | Uso                                       |
-| ------------ | ----------------------------------------- |
-| PHP 8+       | Lógica del servidor, sesiones y seguridad |
-| MySQL        | Usuarios y mensajes de contacto           |
-| PDO          | Acceso a la base de datos preparado       |
-| JavaScript   | Interfaz dinámica sin librerías           |
-| HTML5 / CSS3 | Marcado semántico y diseño responsive     |
-
-## Estructura del proyecto
-
-```
-login-register-php/
+```text
+authcore-php/
 ├── assets/
-│   ├── css/styles.css          # Sistema de diseño completo (claro/oscuro)
-│   └── js/main.js              # Toda la interacción del cliente
+│   ├── css/styles.css        # Variables de diseño y estilos globales
+│   └── js/app.js             # Lógica de cliente y manipulación del DOM
 ├── config/
-│   └── database.example.php    # Plantilla de conexión (el real va en .gitignore)
+│   └── db.example.php        # Plantilla de credenciales de la BD
 ├── includes/
-│   ├── funciones.php           # Helpers: escape, CSRF, flash, fechas
-│   ├── header.php              # Cabecera común: SEO, nav, toasts
-│   └── footer.php              # Pie común y carga del JS
+│   ├── helpers.php           # Funciones globales (CSRF, sanitización, flash)
+│   ├── header.php            # Shell superior, SEO y navegación
+│   └── footer.php            # Scripts y cierre de estructura
 ├── sql/
-│   └── database.sql            # Esquema completo de la base de datos
-├── index.php                   # Portada pública
-├── register.php                # Registro con medidor de contraseña
-├── login.php                   # Login con bloqueo anti fuerza bruta
-├── dashboard.php               # Panel privado con estadísticas
-├── perfil.php                  # Edición de datos y contraseña
-├── contacto.php                # Formulario de contacto (guarda en BD)
-├── acerca-de.php               # Página "Acerca de"
-├── faq.php                     # Preguntas frecuentes (<details>)
-├── 404.php                     # Página de error personalizada
-├── logout.php                  # Cierre de sesión seguro
+│   └── schema.sql            # Script de inicialización de tablas
+├── index.php                 # Landing page principal
+├── login.php                 # Acceso con protección anti fuerza bruta
+├── register.php              # Registro de nuevos usuarios
+├── dashboard.php             # Área privada de usuario
+├── profile.php               # Gestión del perfil y credenciales
+├── contact.php               # Módulo de mensajes directos
+├── logout.php                # Destrucción segura de sesión
 └── README.md
 ```
 
-## Puesta en marcha
+## Instalación & Configuración
 
-### 1. Clona el repositorio
-
+### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/login-register-php.git
-cd login-register-php
+git clone https://github.com/tu-usuario/authcore-php.git
+cd authcore-php
 ```
 
-### 2. Importa la base de datos
-
-Desde phpMyAdmin o por consola:
-
+### 2. Cargar la base de datos
+Importa el archivo `sql/schema.sql` desde tu cliente MySQL o CLI:
 ```bash
-mysql -u root -p < sql/database.sql
+mysql -u tu_usuario -p tu_base_datos < sql/schema.sql
 ```
 
-> Si ya tenías una versión anterior del proyecto, vuelve a importar el SQL:
-> el esquema cambió (columnas `creado_en` y `ultimo_acceso`, tabla nueva `mensajes`).
-
-### 3. Configura la conexión
-
+### 3. Configurar entorno
+Copia la plantilla de configuración y ajusta tus credenciales locales:
 ```bash
-cp config/database.example.php config/database.php
+cp config/db.example.php config/db.php
 ```
 
-Edita ese archivo con tus credenciales. Está excluido por `.gitignore`, así que
-nunca se subirá al repositorio.
-
-### 4. Arranca el servidor
-
+### 4. Iniciar el servidor
 ```bash
 php -S localhost:8000
 ```
+Accede a `http://localhost:8000` en tu navegador.
 
-Abre `http://localhost:8000` en tu navegador.
+## Seguridad Implementada
 
-## Seguridad implementada
+- `password_hash()` (bcrypt) y `password_verify()` para contraseñas.
+- Consultas preparadas PDO con parámetros nombrados.
+- Tokens CSRF validados con `hash_equals()` en peticiones POST.
+- Control de intentos fallidos de login por sesión.
+- Headers HTTP de seguridad (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`).
 
-- `password_hash()` (bcrypt) y `password_verify()` para todas las contraseñas.
-- Sentencias preparadas con parámetros nombrados en todas las consultas.
-- Tokens CSRF validados con `hash_equals()` en cada envío POST.
-- Bloqueo temporal del login tras intentos fallidos repetidos.
-- `htmlspecialchars()` en toda salida dinámica (prevención de XSS).
-- `session_regenerate_id(true)` tras login y registro (fijación de sesión).
-- Mensajes de error genéricos (no se revela si un correo está registrado).
-- Cabeceras HTTP de seguridad (`nosniff`, `X-Frame-Options`, `Referrer-Policy`).
-- `.htaccess` que bloquea el acceso directo a archivos de configuración.
+## Hoja de Ruta (Roadmap)
 
-## Personalización rápida
-
-- **Colores y tema:** edita las variables al inicio de `assets/css/styles.css`.
-- **Enlaces de navegación:** array `$enlaces_nav` en `includes/header.php`.
-- **Datos de contacto:** cambia los enlaces en `contacto.php` y el pie de página.
-- **Página 404 en Apache:** ajusta la ruta en `.htaccess` si el proyecto vive
-  dentro de un subdirectorio.
-
-## Mejoras futuras
-
-- Verificación del correo electrónico al registrarse.
-- Recuperación de contraseña por email.
-- Panel de administración para leer los mensajes de contacto.
-- Limitación de intentos persistente en base de datos (no solo en sesión).
+- [ ] Confirmación de cuenta vía correo electrónico.
+- [ ] Flujo de recuperación de contraseña con tokens de un solo uso.
+- [ ] Dashboard administrativo para lectura de mensajes de contacto.
+- [ ] Persistencia del bloqueo de intentos fallidos en base de datos.
 
 ## Licencia
 
-MIT — siéntete libre de usarlo, estudiarlo y modificarlo.
+Este proyecto está distribuido bajo la licencia **MIT**. Libre para modificar, distribuir y adaptar.
